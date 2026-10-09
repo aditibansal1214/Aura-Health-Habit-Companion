@@ -17,10 +17,17 @@ import { SmartQuickLogSheet } from './components/quicklog/SmartQuickLogSheet';
 import { AccountabilityCircleSheet } from './components/circle/AccountabilityCircleSheet';
 import { PrivacyDashboardSheet } from './components/privacy/PrivacyDashboardSheet';
 import { FeatureFlagsSheet } from './components/settings/FeatureFlagsSheet';
+import { CustomProfileModal } from './components/profile/CustomProfileModal';
 import { SafetyNetBanner } from './components/common/SafetyNetBanner';
 import { DelightMascot } from './components/common/DelightMascot';
 import { translations } from './services/translations';
 import { soundService } from './services/sound';
+import {
+  initialDailyLogs,
+  initialMoodEnergyLogs,
+  initialBPLogs,
+  testPersonas,
+} from './services/mockData';
 import {
   StorageService,
   OneThingState,
@@ -53,6 +60,9 @@ import {
   Info,
   CheckCircle,
   Clock,
+  User as UserIcon,
+  Settings,
+  Pencil,
 } from 'lucide-react';
 
 export default function App() {
@@ -67,6 +77,7 @@ export default function App() {
   const [isCircleModalOpen, setIsCircleModalOpen] = useState(false);
   const [isPrivacyModalOpen, setIsPrivacyModalOpen] = useState(false);
   const [isFeatureFlagsOpen, setIsFeatureFlagsOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [selectedFlag, setSelectedFlag] = useState<HealthFlag | null>(null);
 
   // Persistent Domain State
@@ -332,6 +343,39 @@ export default function App() {
     setMoodLogs([]);
     setDailyLogs([]);
     setBPLogs([]);
+    StorageService.setMoodLogs([]);
+    StorageService.setDailyLogs([]);
+    StorageService.setBPLogs([]);
+  };
+
+  const handleSeedData = (type: 'rich16days' | 'cleanToday') => {
+    if (type === 'rich16days') {
+      setDailyLogs(initialDailyLogs);
+      setMoodLogs(initialMoodEnergyLogs);
+      setBPLogs(initialBPLogs);
+      StorageService.setDailyLogs(initialDailyLogs);
+      StorageService.setMoodLogs(initialMoodEnergyLogs);
+      StorageService.setBPLogs(initialBPLogs);
+    } else {
+      const today = new Date().toISOString().split('T')[0];
+      const singleToday: DailyLog[] = [
+        {
+          date: today,
+          steps: 0,
+          sleepHours: 0,
+          waterGlasses: 0,
+          activeMinutes: 0,
+          meals: [],
+          wearableSource: 'Manual',
+        },
+      ];
+      setDailyLogs(singleToday);
+      setMoodLogs([]);
+      setBPLogs([]);
+      StorageService.setDailyLogs(singleToday);
+      StorageService.setMoodLogs([]);
+      StorageService.setBPLogs([]);
+    }
   };
 
   // Calculate recent average mood for Gentle Safety Net
@@ -348,6 +392,7 @@ export default function App() {
       preferences={preferences}
       onUpdatePreferences={handleUpdatePreferences}
       onOpenFeatureFlags={() => setIsFeatureFlagsOpen(true)}
+      onOpenProfile={() => setIsProfileModalOpen(true)}
     >
       {/* Top App Header Zone */}
       <div className="flex items-center justify-between pt-2 pb-3 mb-2 border-b border-slate-200/80">
@@ -355,9 +400,22 @@ export default function App() {
           <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest block">
             {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
           </span>
-          <h1 className="text-base font-bold text-slate-900 tracking-tight">
-            {preferences.readingLevel === 'simple' ? 'Hello ' : 'Welcome, '}{preferences.name}
-          </h1>
+          <button
+            onClick={() => {
+              soundService.playTap();
+              setIsProfileModalOpen(true);
+            }}
+            className="group flex items-center gap-1.5 text-left"
+            title="Customise your profile"
+          >
+            <h1 className="text-base font-bold text-slate-900 tracking-tight group-hover:text-teal-700 transition-colors">
+              {preferences.readingLevel === 'simple' ? 'Hello ' : 'Welcome, '}{preferences.name}
+            </h1>
+            <span className="text-[10px] text-teal-800 bg-teal-50 group-hover:bg-teal-100 border border-teal-200 px-1.5 py-0.5 rounded-md font-semibold flex items-center gap-0.5">
+              <Pencil className="w-2.5 h-2.5" />
+              <span>Edit</span>
+            </span>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -695,24 +753,109 @@ export default function App() {
       {/* TAB 5: PROFILE & PRIVACY */}
       {currentTab === 'profile' && (
         <div className="space-y-4 animate-in fade-in duration-200">
-          {/* Profile Card */}
-          <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <DelightMascot mood="calm" size="sm" />
-              <div>
-                <h3 className="text-sm font-bold text-slate-900">{preferences.name}</h3>
-                <span className="text-[11px] text-slate-500">
-                  {preferences.readingLevel === 'simple' ? 'Simple Words' : 'Standard'} Mode · {preferences.language.toUpperCase()}
-                </span>
+          {/* Rich Profile Card */}
+          <div className="p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <DelightMascot mood="calm" size="sm" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-bold text-slate-900">{preferences.name}</h3>
+                    <span className="text-[11px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md font-semibold">
+                      {preferences.age || 38} yrs
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    {preferences.readingLevel === 'simple' ? 'Simple Words' : 'Standard'} Mode · {preferences.language.toUpperCase()} · {preferences.seasonalTheme}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  soundService.playTap();
+                  setIsProfileModalOpen(true);
+                }}
+                className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-xs"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Customise</span>
+              </button>
+            </div>
+
+            {/* Health Intent / Bio */}
+            {preferences.bioNotes && (
+              <p className="text-xs text-slate-700 italic bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                "{preferences.bioNotes}"
+              </p>
+            )}
+
+            {/* Custom Daily Targets Summary */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                <span className="text-[9px] uppercase font-bold text-slate-400 block">Step Goal</span>
+                <span className="text-xs font-mono font-bold text-slate-900">{(preferences.targetSteps || 7000).toLocaleString()}</span>
+              </div>
+              <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                <span className="text-[9px] uppercase font-bold text-slate-400 block">Sleep Goal</span>
+                <span className="text-xs font-mono font-bold text-slate-900">{preferences.targetSleep || 7.5}h</span>
+              </div>
+              <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-100">
+                <span className="text-[9px] uppercase font-bold text-slate-400 block">Water Goal</span>
+                <span className="text-xs font-mono font-bold text-slate-900">{preferences.targetWater || 8} gls</span>
               </div>
             </div>
-            <button
-              onClick={() => setIsFeatureFlagsOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold flex items-center gap-1"
-            >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Features</span>
-            </button>
+
+            {/* Clinical Context Counts */}
+            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-900">{preferences.medications.length}</span>
+                <span>Active Meds</span>
+                <span className="text-slate-300">·</span>
+                <span className="font-semibold text-slate-900">{preferences.familyHistory.length}</span>
+                <span>Family History Items</span>
+              </div>
+
+              <button
+                onClick={() => setIsFeatureFlagsOpen(true)}
+                className="text-[11px] text-teal-700 font-semibold hover:underline flex items-center gap-1"
+              >
+                <Sliders className="w-3 h-3" />
+                <span>Feature Flags</span>
+              </button>
+            </div>
+
+            {/* Quick 1-Tap Persona Switcher */}
+            <div className="pt-2 border-t border-slate-100">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                Quick Test Personas (1-Tap Switch)
+              </span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {testPersonas.map((persona) => {
+                  const isCur = preferences.name === persona.preferences.name;
+                  return (
+                    <button
+                      key={persona.id}
+                      onClick={() => {
+                        soundService.playWin();
+                        setPreferences({ ...preferences, ...persona.preferences });
+                        StorageService.setPreferences({ ...preferences, ...persona.preferences });
+                        setQuitSmoking({ ...quitSmoking, enabled: persona.quitSmokingEnabled });
+                        StorageService.setQuitSmoking({ ...quitSmoking, enabled: persona.quitSmokingEnabled });
+                      }}
+                      className={`p-2 rounded-xl text-left border transition-all ${
+                        isCur
+                          ? 'bg-teal-50 border-teal-300 text-teal-950 font-semibold'
+                          : 'bg-slate-50 border-slate-200 hover:border-slate-300 text-slate-700'
+                      }`}
+                    >
+                      <span className="text-xs block font-bold truncate">{persona.preferences.name}</span>
+                      <span className="text-[10px] text-slate-500 block truncate">{persona.preferences.age}y · {persona.preferences.medications[0]?.split(' ')[0] || 'No meds'}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           {/* Feature 18: Privacy Dashboard Entry */}
@@ -901,6 +1044,23 @@ export default function App() {
         onClose={() => setIsFeatureFlagsOpen(false)}
         flags={featureFlags}
         onToggleFlag={handleToggleFeatureFlag}
+      />
+
+      {/* Customizable User Profile Modal & Data Simulator */}
+      <CustomProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        preferences={preferences}
+        onSavePreferences={(updated) => {
+          setPreferences(updated);
+          StorageService.setPreferences(updated);
+        }}
+        quitSmoking={quitSmoking}
+        onUpdateQuitSmoking={(updated) => {
+          setQuitSmoking(updated);
+          StorageService.setQuitSmoking(updated);
+        }}
+        onSeedData={handleSeedData}
       />
     </DeviceFrame>
   );

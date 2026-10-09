@@ -2,6 +2,7 @@
   "name": "Aura Health & Habit Companion",
   "description": "Empathetic mobile health and habit companion featuring One Thing Today, gentle grace-period streaks, quiet adaptive nudges, guided vitals checks, doctor-visit prep, and privacy-first architecture.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
-

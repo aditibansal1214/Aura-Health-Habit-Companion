@@ -37,6 +37,7 @@ export const initialFeatureFlags: FeatureFlags = {
 
 export const initialUserPreferences: UserPreferences = {
   name: 'Alex',
+  age: 38,
   readingLevel: 'standard',
   language: 'en',
   largeText: false,
@@ -50,6 +51,11 @@ export const initialUserPreferences: UserPreferences = {
   peerContextOptIn: false,
   medications: ['Lisinopril 10mg (morning)', 'Magnesium Glycinate 200mg (night)'],
   familyHistory: ['Maternal hypertension', 'Type 2 Diabetes (Paternal Grandparent)'],
+  allergies: ['No known drug allergies'],
+  targetSteps: 7000,
+  targetSleep: 7.5,
+  targetWater: 7,
+  bioNotes: 'Focusing on morning vascular calm and consistent wind-down sleep.',
 };
 
 export const initialNudgeConfig: NudgeConfig = {
@@ -347,3 +353,106 @@ export const initialAccountabilityPartners: AccountabilityPartner[] = [
     }
   }
 ];
+
+export interface TestPersona {
+  id: string;
+  label: string;
+  description: string;
+  preferences: UserPreferences;
+  quitSmokingEnabled: boolean;
+}
+
+export const testPersonas: TestPersona[] = [
+  {
+    id: 'persona-alex',
+    label: 'Alex (Default: Balanced Routine)',
+    description: '38 yrs · Pre-hypertension monitoring · 7,000 steps · Lisinopril',
+    quitSmokingEnabled: true,
+    preferences: initialUserPreferences,
+  },
+  {
+    id: 'persona-elena',
+    label: 'Elena (Hypertension & Rest Recovery)',
+    description: '54 yrs · Strict BP protocol · 6,000 steps · Lisinopril 20mg & Amlodipine',
+    quitSmokingEnabled: false,
+    preferences: {
+      name: 'Elena',
+      age: 54,
+      readingLevel: 'standard',
+      language: 'en',
+      largeText: true,
+      colorBlindSafe: false,
+      soundEnabled: true,
+      hapticEnabled: true,
+      pauseCoaching: false,
+      seasonalTheme: 'autumn',
+      deviceFrame: 'iphone',
+      researchContribution: false,
+      peerContextOptIn: true,
+      medications: ['Lisinopril 20mg (morning)', 'Amlodipine 5mg (night)', 'Baby Aspirin 81mg'],
+      familyHistory: ['Maternal stroke at age 62', 'Early coronary artery disease'],
+      allergies: ['Penicillin (rash)', 'Codeine'],
+      targetSteps: 6000,
+      targetSleep: 8.0,
+      targetWater: 8,
+      bioNotes: 'Preparing for quarterly cardiologist consultation; tracking morning cuff accuracy.',
+    },
+  },
+  {
+    id: 'persona-marcus',
+    label: 'Marcus (High Movement & Endurance)',
+    description: '29 yrs · Active endurance runner · 11,000 steps · Electrolytes & Magnesium',
+    quitSmokingEnabled: false,
+    preferences: {
+      name: 'Marcus',
+      age: 29,
+      readingLevel: 'simple',
+      language: 'en',
+      largeText: false,
+      colorBlindSafe: false,
+      soundEnabled: true,
+      hapticEnabled: true,
+      pauseCoaching: false,
+      seasonalTheme: 'summer',
+      deviceFrame: 'pixel',
+      researchContribution: true,
+      peerContextOptIn: true,
+      medications: ['Magnesium Glycinate 400mg', 'Electrolyte hydration tablet (post-run)'],
+      familyHistory: ['Asthma', 'Mild osteoarthritis'],
+      allergies: ['No known drug allergies'],
+      targetSteps: 11000,
+      targetSleep: 8.2,
+      targetWater: 10,
+      bioNotes: 'Training for half marathon; prioritizing sleep recovery and beat-your-own-average steps.',
+    },
+  },
+  {
+    id: 'persona-priya',
+    label: 'Priya (Stress Calm & Smoke-Free Journey)',
+    description: '33 yrs · Quit-smoking SOS & Box breathing · 6,500 steps · Hindi support ready',
+    quitSmokingEnabled: true,
+    preferences: {
+      name: 'Priya',
+      age: 33,
+      readingLevel: 'standard',
+      language: 'en',
+      largeText: false,
+      colorBlindSafe: true,
+      soundEnabled: true,
+      hapticEnabled: true,
+      pauseCoaching: false,
+      seasonalTheme: 'spring',
+      deviceFrame: 'iphone',
+      researchContribution: false,
+      peerContextOptIn: false,
+      medications: ['Nicotine gum 2mg (as needed for cravings)', 'Ashwagandha 300mg', 'Vitamin D3 2000IU'],
+      familyHistory: ['Hypertension', 'Type 2 Diabetes'],
+      allergies: ['Sulfa drugs'],
+      targetSteps: 6500,
+      targetSleep: 7.2,
+      targetWater: 7,
+      bioNotes: 'Day 8 smoke-free; utilizing Craving SOS breathing techniques and gentle habit stacks.',
+    },
+  },
+];
+

@@ -150,6 +150,7 @@ export interface NudgeConfig {
 
 export interface UserPreferences {
   name: string;
+  age: number;
   readingLevel: ReadingLevel;
   language: AppLanguage;
   largeText: boolean;
@@ -163,4 +164,9 @@ export interface UserPreferences {
   peerContextOptIn: boolean;
   medications: string[];
   familyHistory: string[];
+  allergies?: string[];
+  targetSteps?: number;
+  targetSleep?: number;
+  targetWater?: number;
+  bioNotes?: string;
 }

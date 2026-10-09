@@ -10,6 +10,7 @@ interface DeviceFrameProps {
   preferences: UserPreferences;
   onUpdatePreferences: (updated: Partial<UserPreferences>) => void;
   onOpenFeatureFlags: () => void;
+  onOpenProfile?: () => void;
 }
 
 export const DeviceFrame: React.FC<DeviceFrameProps> = ({
@@ -19,6 +20,7 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({
   preferences,
   onUpdatePreferences,
   onOpenFeatureFlags,
+  onOpenProfile,
 }) => {
   const [timeStr, setTimeStr] = useState('09:41');
 
@@ -160,6 +162,21 @@ export const DeviceFrame: React.FC<DeviceFrameProps> = ({
               <VolumeX className="w-3.5 h-3.5 text-slate-400" />
             )}
           </button>
+
+          {/* Custom Profile Button */}
+          {onOpenProfile && (
+            <button
+              onClick={() => {
+                soundService.playTap();
+                onOpenProfile();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-teal-300 font-semibold border border-slate-700 transition-colors"
+              title="Customise Profile & Details"
+            >
+              <Smartphone className="w-3.5 h-3.5 text-teal-400" />
+              <span>Edit Profile</span>
+            </button>
+          )}
 
           {/* 20 Feature Flags Manager */}
           <button

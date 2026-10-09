@@ -121,7 +121,10 @@ export const DoctorVisitSummary: React.FC<DoctorVisitSummaryProps> = ({
                   Patient Home Health & Vitals Summary
                 </h1>
                 <p className="text-xs text-slate-600 mt-0.5">
-                  Prepared for: <span className="font-semibold text-slate-900">{preferences.name}</span> · Age Group: 35–45
+                  Prepared for: <span className="font-semibold text-slate-900">{preferences.name}</span> · Age: <span className="font-semibold text-slate-900">{preferences.age || 38}</span>
+                  {preferences.allergies && preferences.allergies.length > 0 && (
+                    <span> · Allergies: {preferences.allergies.join(', ')}</span>
+                  )}
                 </p>
               </div>
               <div className="text-right text-xs text-slate-500 font-mono">
